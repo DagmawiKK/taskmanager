@@ -16,13 +16,12 @@ exports.getTasks = async (req, res) => {
         }
 
         const tasks = await Task.find(query);
-        res.json(tasks);
+        res.status(200).json({ success: true, data: tasks });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
-// POST /api/tasks - Add a new task
 // POST /api/tasks - Add a new task
 exports.createTask = async (req, res) => {
     try {
@@ -34,7 +33,6 @@ exports.createTask = async (req, res) => {
         if (title.length > 100) {
             return res.status(400).json({ error: 'Title must not exceed 100 characters' });
         }
-
         if (body !== undefined && typeof body !== 'string') {
             return res.status(400).json({ error: 'Body must be a string' });
         }
@@ -50,7 +48,7 @@ exports.createTask = async (req, res) => {
         });
 
         await newTask.save();
-        res.status(201).json(newTask);
+        res.status(201).json({ success: true, data: newTask });
     } catch (error) {
         if (error.code === 11000) {
             return res.status(400).json({ error: 'Task ID already exists' });
@@ -59,7 +57,7 @@ exports.createTask = async (req, res) => {
     }
 };
 
-// PUT /api/tasks/:id - Update completion status (or any field)
+// PUT /api/tasks/:id - Update a task
 exports.updateTask = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
@@ -81,7 +79,7 @@ exports.updateTask = async (req, res) => {
         task.updatedAt = new Date();
 
         await task.save();
-        res.json(task);
+        res.status(200).json({ success: true, message: 'Task updated successfully', data: task });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -100,7 +98,7 @@ exports.deleteTask = async (req, res) => {
             return res.status(404).json({ error: 'Task not found' });
         }
 
-        res.status(204).send();
+        res.status(200).json({ success: true, message: 'Task deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
